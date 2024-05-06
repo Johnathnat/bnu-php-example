@@ -1,62 +1,69 @@
 <?php
+// Include configuration and database connection
+include("_includes/config.inc");
+include("_includes/dbconnect.inc");
+include("_includes/functions.inc");
 
-   include("_includes/config.inc");
-   include("_includes/dbconnect.inc");
-   include("_includes/functions.inc");
+// Check if the user is logged in
+if (isset($_SESSION['id'])) {
+    // Build SQL statement to select student information
+    $sql = "SELECT * FROM student";
+    $result = mysqli_query($conn, $sql);
 
+    // Prepare page content
+    $tableContent = "<table style='float: left; margin-left: 1%;' border='1'>";
+    $tableContent .= "<tr><th>Student ID</th><th>Password</th><th>Date of Birth</th><th>First Name</th><th>Last Name</th><th>House</th><th>Town</th><th>County</th><th>Country</th><th>Postcode</th><th>Select</th></tr>";
+    $tableContent .= "<form action='deletestudents.php' method='POST'>";
+    // Display student information within the HTML table
+    while ($row = mysqli_fetch_array($result)) {
+        $tableContent .= "<tr>";
+        $tableContent .= "<td>{$row['studentid']}</td>";
+        $tableContent .= "<td>{$row['password']}</td>";
+        $tableContent .= "<td>{$row['dob']}</td>";
+        $tableContent .= "<td>{$row['firstname']}</td>";
+        $tableContent .= "<td>{$row['lastname']}</td>";
+        $tableContent .= "<td>{$row['house']}</td>";
+        $tableContent .= "<td>{$row['town']}</td>";
+        $tableContent .= "<td>{$row['county']}</td>";
+        $tableContent .= "<td>{$row['country']}</td>"; 
+        $tableContent .= "<td>{$row['postcode']}</td>";
+        $tableContent .= "<td><input type='checkbox' name='students[]' value='$row[studentid]'></td>";
 
-   // check logged in
-   if (isset($_SESSION['id'])) {
+        $tableContent .= "</tr>";
+    }
 
-      echo template("templates/partials/header.php");
-      echo template("templates/partials/nav.php");
+    $tableContent .= "</table>";
 
-      // Build SQL statment that selects a student's modules
-      //Rewrite query to student SELECT
-      //$sql = "select * from studentmodules sm, module m where m.modulecode = sm.modulecode and sm.studentid = '" . $_SESSION['id'] ."';";
-        $sql = "SELECT * FROM student";
-      $result = mysqli_query($conn,$sql);
+    // Add a delete button to delete selected rows
 
-      // prepare page content
-      $data['content'] .= "<table border='1'>";
-      $data['content'] .= "<tr><th colspan='5' align='center'>Modules</th></tr>";
-      $data['content'] .= "<tr><th>Student ID</th> <th>Password</th> <th>Date of Birth</th> <th>First Name</th> <th>Second Name</th> <th>House</th> <th>Town</th> <th>County</th> <th>Country</th> <th>Postcode</th> </tr>";
-      // Display the modules within the html table
-      while($row = mysqli_fetch_array($result)) {
-        //Start of table
-        $data['content'] .= "<tr>";
-        //Student ID
-        $data['content'] .= "<td> {$row["studentid"]} </td>";
-        //Password
-        $data['content'] .= "<td> {$row["passwords"]} </td>";
-        //Date Of Birth
-        $data['content'] .= "<td> {$row["dob"]} </td>";
-        //First Name
-        $data['content'] .= "<td> {$row["firstname"]} </td>";
-        //Second Name
-        $data['content'] .= "<td> {$row["secondname"]} </td>";
-        //House
-        $data['content'] .= "<td> {$row["house"]} </td>";
-        //Town
-        $data['content'] .= "<td> {$row["town"]} </td>";
-        //County
-        $data['content'] .= "<td> {$row["county"]} </td>";
-        //Country
-        $data['content'] .= "<td> {$row["contry"]} </td>";
-        //Postcode
-        $data['content'] .= "<td> {$row["postcode"]} </td>";
-        //end of table
-        $data['content'] .= "</tr>";
-      }
-      $data['content'] .= "</table>";
+    $tableContent .= "<input type='submit' name='deletebtn' value='Delete' />";
+    $tableContent .= "</form>";
 
-      // render the template
-      echo template("templates/default.php", $data);
-
-   } else {
-      header("Location: index.php");
-   }
-
-   echo template("templates/partials/footer.php");
-
+    // Render the template 
+    echo template("templates/partials/header.php");
+    echo template("templates/partials/nav.php");
+    echo "<style>
+        body {
+            margin-left: 10px;
+            color: black;
+            background: white;
+        }
+        th {
+            text-align: center;
+            padding: 10px;
+        }
+        td {
+            text-align: center;
+            padding: 5px;
+        }
+        tr:hover {
+            background-color: #D6EEEE;
+        }
+    </style>";
+    echo $tableContent;
+    echo template("templates/partials/footer.php");
+} else {
+    // Redirect to login page if not logged in
+    header("Location: index.php");
+}
 ?>

@@ -24,7 +24,7 @@ include("_includes/functions.inc");
     for ($i = 0; $i < 5; $i++) 
     {
         $studentids = $studentData['studentids'][$i];
-        $passwords = $studentData['passwords'][$i];
+        $password = $studentData['passwords'][$i];
         $dobs = $studentData['dobs'][$i];
         $first_name = $studentData['first_names'][$i];
         $last_name = $studentData['last_names'][$i];
@@ -34,7 +34,7 @@ include("_includes/functions.inc");
         $postcode = $studentData['postcodes'][$i];
 
         // Build the SQL statement for inserting a new student
-        $sql = "INSERT INTO student (studentid, passwords, dob, firstname, lastname, house, town, county, country, postcode) VALUES ('$studentids', '$passwords', '$dobs', '$first_name', '$last_name', '$house', '$town', '$county', 'United Kingdom', '$postcode')";
+        $sql = "INSERT INTO student (studentid, passwords, dob, firstname, lastname, house, town, county, country, postcode) VALUES ('$studentids', '$password', '$dobs', '$first_name', '$last_name', '$house', '$town', '$county', 'United Kingdom', '$postcode')";
         
 
         // Execute the query
