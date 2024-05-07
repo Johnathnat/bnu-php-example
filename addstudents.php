@@ -3,6 +3,39 @@ include("_includes/config.inc");
 include("_includes/dbconnect.inc");
 include("_includes/functions.inc");
 
+function handleImageUpload($fileInputName, $targetDirectory, $maxSize = 2097152) {
+    // Check if the file was uploaded successfully
+    if (!isset($_FILES[$fileInputName])) {
+        return "No file uploaded.";
+    }
+
+    $imageFile = $_FILES[$fileInputName];
+
+    // Set acceptable file types (MIME types)
+    $acceptableTypes = ['image/jpeg', 'image/png', 'image/gif'];
+
+    // Check file size
+    if ($imageFile['size'] > $maxSize) {
+        return "File too large. Please upload an image smaller than 2MB.";
+    }
+
+    // Check file type
+    if (!in_array($imageFile['type'], $acceptableTypes)) {
+        return "Invalid file type. Only JPG, PNG, and GIF types are accepted.";
+    }
+
+    // Generate a unique filename (you can customize this part)
+    $targetFile = $targetDirectory . uniqid() . '_' . basename($imageFile['name']);
+
+    // Move the uploaded file to the desired location
+    if (move_uploaded_file($imageFile['tmp_name'], $targetFile)) {
+        // File uploaded successfully
+        return $targetFile; // Return the saved file path
+    } else {
+        return "Error moving uploaded image.";
+    }
+}
+
 // Display the form initially
 function displayForm() {
     echo <<<EOD
@@ -55,16 +88,13 @@ if (isset($_SESSION['id'])) {
 
         // Handle the uploaded image
         if (isset($_FILES['student_image'])) {
-            $image_errors = [];
-            $image_file = $_FILES['student_image'];
-
-            $target_dir = '_includes/uploads';
-            $target_file = $target_dir . basename($image_file['name']);
-            if (move_uploaded_file($image_file['tmp_name'], $target_file)) {
+            $target_file = handleImageUpload('student_image', '_includes/uploads');
+            if (is_string($target_file)) {
+                // Handle error (display message or log it)
+                echo $target_file;
+            } else {
                 // Image uploaded successfully
                 // Save $target_file path in your database
-            } else {
-                $image_errors[] = 'Error uploading image.';
             }
         }
 
