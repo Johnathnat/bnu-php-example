@@ -12,8 +12,9 @@ if (isset($_SESSION['id'])) {
 
     // Prepare page content
     $tableContent = "<table style='float: left; margin-left: 1%;' border='1'>";
-    $tableContent .= "<tr><th>Student ID</th><th>Password</th><th>Date of Birth</th><th>First Name</th><th>Last Name</th><th>House</th><th>Town</th><th>County</th><th>Country</th><th>Postcode</th><th>Select</th></tr>";
+    $tableContent .= "<tr><th>Student ID</th><th>Password</th><th>Date of Birth</th><th>First Name</th><th>Last Name</th><th>House</th><th>Town</th><th>County</th><th>Country</th><th>Postcode</th><th>Photo</th><th>Select</th></tr>";
     $tableContent .= "<form action='deletestudents.php' method='POST'>";
+    
     // Display student information within the HTML table
     while ($row = mysqli_fetch_array($result)) {
         $tableContent .= "<tr>";
@@ -27,7 +28,8 @@ if (isset($_SESSION['id'])) {
         $tableContent .= "<td>{$row['county']}</td>";
         $tableContent .= "<td>{$row['country']}</td>"; 
         $tableContent .= "<td>{$row['postcode']}</td>";
-        $tableContent .= "<td><input type='checkbox' name='students[]' value='$row[studentid]'></td>";
+        $tableContent .= "<td><img src='{$row['photoid']}' alt='Student Photo' width='100'></td>"; // Display the photo
+        $tableContent .= "<td><input type='checkbox' name='students[]' value='{$row['studentid']}'></td>";
 
         $tableContent .= "</tr>";
     }
@@ -35,7 +37,6 @@ if (isset($_SESSION['id'])) {
     $tableContent .= "</table>";
 
     // Add a delete button to delete selected rows
-
     $tableContent .= "<input type='submit' name='deletebtn' value='Delete' />";
     $tableContent .= "</form>";
 
@@ -48,11 +49,7 @@ if (isset($_SESSION['id'])) {
             color: black;
             background: white;
         }
-        th {
-            text-align: center;
-            padding: 10px;
-        }
-        td {
+        th, td {
             text-align: center;
             padding: 5px;
         }

@@ -7,7 +7,7 @@ include("_includes/functions.inc");
 function displayForm() {
     echo <<<EOD
     <h2>Add New Student</h2>
-    <form name="frmdetails" action="" method="post">
+    <form enctype="multipart/form-data" name="frmdetails" action="" method="post">
         Student ID:
         <input name="txtstudentid" type="text" value="" /><br/>
         First Name:
@@ -15,7 +15,9 @@ function displayForm() {
         Last Name:
         <input name="txtlastname" type="text" value="" /><br/>
         Date of Birth:
-        <input name="dob" type="date" /><br/> <!-- Add this line for date input -->
+        <input name="dob" type="date" /><br/>
+        ID Image:
+        <input type="file" name="student_image" accept="image/*" /><br/> <!-- Add this line for image upload -->
         Number and Street:
         <input name="txthouse" type="text" value="" /><br/>
         Town:
@@ -50,6 +52,22 @@ if (isset($_SESSION['id'])) {
         $country = mysqli_real_escape_string($conn, $_POST['txtcountry']);
         $postcode = mysqli_real_escape_string($conn, $_POST['txtpostcode']);
         $dob = mysqli_real_escape_string($conn, $_POST['dob']);
+
+        // Handle the uploaded image
+        if (isset($_FILES['student_image'])) {
+            $image_errors = [];
+            $image_file = $_FILES['student_image'];
+
+            $target_dir = '_includes/uploads';
+            $target_file = $target_dir . basename($image_file['name']);
+            if (move_uploaded_file($image_file['tmp_name'], $target_file)) {
+                // Image uploaded successfully
+                // Save $target_file path in your database
+            } else {
+                $image_errors[] = 'Error uploading image.';
+            }
+        }
+
         // Hash the password securely (using bcrypt)
         $password = password_hash($_POST['txtpassword'], PASSWORD_BCRYPT);
 
@@ -62,11 +80,10 @@ if (isset($_SESSION['id'])) {
             displayForm();
         } else {
             // Insert the student record into the database
-            $sql = "INSERT INTO student (studentid, password, firstname, lastname, house, town, county, country, postcode, dob) 
-                    VALUES ('$studentId', '$password', '$firstName', '$lastName', '$house', '$town', '$county', '$country', '$postcode', '$dob')";
+            $sql = "INSERT INTO student (studentid, password, firstname, lastname, house, town, county, country, postcode, dob, photoid) 
+                    VALUES ('$studentId', '$password', '$firstName', '$lastName', '$house', '$town', '$county', '$country', '$postcode', '$dob', '$target_file')";
             $result = mysqli_query($conn, $sql);
             echo "<p>Your student record has been added</p>";
-            header("Location: students.php");
         }
     } else {
         displayForm();
